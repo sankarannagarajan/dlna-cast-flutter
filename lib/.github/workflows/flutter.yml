@@ -1,24 +1,30 @@
 name: Flutter Build APK
 
-on: [push, workflow_dispatch]
+on:
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - name: Fetch Repository Code
-        uses: actions/checkout@v4
+      - name: Fetch Codebase
+        uses: actions/checkout@v4.2.2
 
       - name: Setup Java Environment
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v4.4.0
         with:
           distribution: 'zulu'
           java-version: '17'
 
       - name: Setup Flutter Framework
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v2.18.0
         with:
           channel: 'stable'
+
+      - name: Create Missing Native Layout
+        run: |
+          # Automatically generates the missing native android wrapper files in the cloud environment
+          flutter create . --platforms=android
 
       - name: Download App Dependencies
         run: flutter pub get
@@ -27,7 +33,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
